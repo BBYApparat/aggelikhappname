@@ -1,4 +1,4 @@
-package com.realnow.realnow
+package com.realnow.app
 
 import io.flutter.embedding.android.FlutterActivity
 

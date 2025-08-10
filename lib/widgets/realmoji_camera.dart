@@ -25,6 +25,8 @@ class _RealMojiCameraState extends State<RealMojiCamera> {
 
   Future<void> _initializeCamera() async {
     try {
+      await Future.delayed(const Duration(milliseconds: 500)); // Delay to avoid conflicts
+      
       final cameras = await availableCameras();
       final frontCamera = cameras.firstWhere(
         (camera) => camera.lensDirection == CameraLensDirection.front,
@@ -46,6 +48,9 @@ class _RealMojiCameraState extends State<RealMojiCamera> {
       }
     } catch (e) {
       debugPrint('Error initializing RealMoji camera: $e');
+      if (mounted) {
+        Navigator.pop(context);
+      }
     }
   }
 

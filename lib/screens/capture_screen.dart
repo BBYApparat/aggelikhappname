@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import '../services/camera_service.dart';
 import '../services/post_service.dart';
@@ -22,15 +23,32 @@ class _CaptureScreenState extends State<CaptureScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeCamera();
+    _cameraService = context.read<CameraService>();
+    // Defer initialization until after build completes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeCamera();
+    });
   }
 
   Future<void> _initializeCamera() async {
-    _cameraService = context.read<CameraService>();
-    await _cameraService.initialize();
-    setState(() {
-      _isLoading = false;
-    });
+    if (!_cameraService.isInitialized && !_cameraService.isInitializing) {
+      try {
+        await _cameraService.initialize();
+      } catch (e) {
+        debugPrint('Failed to initialize camera: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Camera initialization failed: $e')),
+          );
+        }
+      }
+    }
+    
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override

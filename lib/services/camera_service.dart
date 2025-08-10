@@ -1,18 +1,28 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 class CameraService extends ChangeNotifier {
   List<CameraDescription> _cameras = [];
   CameraController? _rearController;
   CameraController? _frontController;
   bool _isInitialized = false;
+  bool _isInitializing = false;
 
   List<CameraDescription> get cameras => _cameras;
   CameraController? get rearController => _rearController;
   CameraController? get frontController => _frontController;
   bool get isInitialized => _isInitialized;
+  bool get isInitializing => _isInitializing;
 
   Future<void> initialize() async {
+    if (_isInitialized || _isInitializing) {
+      return;
+    }
+
+    _isInitializing = true;
+    // Don't notify listeners during initialization to avoid build conflicts
+
     try {
       _cameras = await availableCameras();
       
@@ -42,9 +52,18 @@ class CameraService extends ChangeNotifier {
       ]);
 
       _isInitialized = true;
-      notifyListeners();
+      _isInitializing = false;
+      // Notify listeners after build completes to avoid conflicts
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
     } catch (e) {
+      _isInitializing = false;
       debugPrint('Camera initialization error: $e');
+      // Only notify after async operations complete
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
       throw Exception('Failed to initialize cameras: $e');
     }
   }

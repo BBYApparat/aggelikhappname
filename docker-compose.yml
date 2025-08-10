@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: realnow-postgres
+    environment:
+      POSTGRES_DB: realnow
+      POSTGRES_USER: realnow
+      POSTGRES_PASSWORD: realnow_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/database/init:/docker-entrypoint-initdb.d
+    networks:
+      - realnow-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: realnow-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - realnow-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: realnow-backend
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://realnow:realnow_password@postgres:5432/realnow
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: your-jwt-secret-here
+      FIREBASE_PROJECT_ID: your-firebase-project-id
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - realnow-network
+    command: npm run dev
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  realnow-network:
+    driver: bridge

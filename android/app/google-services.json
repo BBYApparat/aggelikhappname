@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "261940654816",
+    "project_id": "realnow-3a3d9",
+    "storage_bucket": "realnow-3a3d9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261940654816:android:c4cc710c229c158b93d685",
+        "android_client_info": {
+          "package_name": "com.realnow.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5-bzd30mCG2Ub5ju8KY1B-wHSvvqtO6A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
